@@ -4,9 +4,10 @@
         <field name="name">property tree</field>
         <field name="model">property</field>
         <field name="arch" type="xml">
-            <tree class="header_custom" multi_edit="1" create="1" edit="1" delete="1">
+            <tree class="header_custom" decoration-danger="(is_late)" multi_edit="1" create="1" edit="1" delete="1">
                 <field name="name"/>
                 <field name="postcode"/>
+                <field name="is_late" invisible="1"/>
                 <field name="owner_id"/>
                 <field name="tag_ids"/>
                 <field name="date_availability" optional="1"/>
@@ -48,6 +49,8 @@
                         <field name="expected_price"/>
                         <field name="diff"/>
                         <field name="selling_price"/>
+                        <field name="expected_selling_date"/>
+                        <field name="is_late" invisible="1"/>
                         <field name="bedrooms"/>
                     </group>
                         <group>
@@ -105,14 +108,27 @@
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="property_view_tree"/>
     </record>
-   <record id="property_closed_server_action" model="ir.actions.server">
-    <field name="name">Close Property</field>
-    <field name="model_id" ref="model_property" />
-    <field name="state">code</field>
-    <field name="code">
-        records.action_closed()
-    </field>
-</record>
+
+
+       <record id="check_selling_date_cron" model="ir.cron">
+            <field name="name">Property: Check Selling Date</field>
+            <field name="model_id" ref="model_property"/>
+            <field name="state">code</field>
+            <field name="code">model.run_check_selling_date()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="active">True</field>
+       </record>
+
+<!--   <record id="property_closed_server_action" model="ir.actions.server">-->
+<!--        <field name="name">Close Property</field>-->
+<!--        <field name="model_id" ref="model_property" />-->
+<!--        <field name="state">code</field>-->
+<!--        <field name="code">-->
+<!--            records.action_closed()-->
+<!--        </field>-->
+<!--    </record>-->
 
  <menuitem id="property_menu_item" name="Properties" parent="properties_menu" action="property_action"/>
 

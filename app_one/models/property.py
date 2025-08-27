@@ -11,6 +11,8 @@ class Property(models.Model):
     name = fields.Text(size=4)
     description = fields.Text(tracking=1, default="New Description")
     date_availability = fields.Date(tracking=1)
+    expected_selling_date = fields.Date(tracking=1)
+    is_late = fields.Boolean()
     expected_price = fields.Float(required=1)
     diff = fields.Float(compute='_compute_diff')
     selling_price = fields.Float(required=1)
@@ -70,6 +72,7 @@ class Property(models.Model):
             rec.state = 'draft'
             # rec.write({'state': 'draft'})
 
+
     def action_pending(self):
         for rec in self:
             print("inside pending action")
@@ -86,6 +89,13 @@ class Property(models.Model):
         for rec in self:
             print("inside sold action")
             rec.state = 'closed'
+
+    def run_check_selling_date(self):
+        print(self)
+        property_ids = self.search([])
+        for rec in property_ids:
+            if rec.expected_selling_date and rec.expected_selling_date < fields.date.today():
+                rec.is_late = True
     # @api.model_create_multi
     # def create(self, vals):
     #     res = super(Property, self).create(vals)
